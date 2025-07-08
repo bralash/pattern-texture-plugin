@@ -157,16 +157,37 @@
             <select id="organicType">
                 <option value="voronoi">Voronoi</option>
                 <option value="delaunay">Delaunay</option>
+                <option value="lsystem">L-System</option>
             </select>
 
-            <label for="pointCount">Number of Points</label>
-            <input type="number" id="pointCount" value="30" />
+            <div id="voronoiSettings">
+                <label for="pointCount">Number of Points</label>
+                <input type="number" id="pointCount" value="30" />
+            </div>
+
+            <div id="lsystemSettings" style="display: none; margin-top: 16px">
+                <label for="axiom">Axiom</label>
+                <input type="text" id="axiom" value="F" />
+
+                <label for="ruleF">Rule for F</label>
+                <input type="text" id="ruleF" value="FF+[+F-F-F]-[-F+F+F]" />
+
+                <label for="angle">Angle (degrees)</label>
+                <input type="number" id="angle" value="25" />
+
+                <label for="iterations">Iterations</label>
+                <input type="number" id="iterations" value="4" />
+
+                <label for="stepSize">Step Size</label>
+                <input type="number" id="stepSize" value="5" />
+            </div>
 
             <label for="organicColor">Stroke Color</label>
             <input type="color" id="organicColor" value="#10b981" />
 
             <button id="generateOrganic">Generate</button>
         </div>
+
         <div id="halftone" class="section hidden">
             <h2>Coming soon: Halftone</h2>
         </div>
@@ -528,6 +549,17 @@
                 ctx.globalAlpha = 1; // Reset alpha
             };
 
+            document
+                .getElementById("organicType")
+                .addEventListener("change", e => {
+                    const val = e.target.value;
+                    const isLSystem = val === "lsystem";
+                    document.getElementById("lsystemSettings").style.display =
+                        isLSystem ? "block" : "none";
+                    document.getElementById("voronoiSettings").style.display =
+                        isLSystem ? "none" : "block";
+                });
+
             document.getElementById("generateNoise").onclick = () => {
                 const type = document.getElementById("noiseType").value;
                 const scale = parseFloat(
@@ -609,6 +641,66 @@
                         ctx.closePath();
                         ctx.stroke();
                     }
+                }
+
+                if (type === "lsystem") {
+                    const axiom = document.getElementById("axiom").value;
+                    const ruleF = document.getElementById("ruleF").value;
+                    const angle = parseFloat(
+                        document.getElementById("angle").value
+                    );
+                    const iterations = parseInt(
+                        document.getElementById("iterations").value
+                    );
+                    const step = parseFloat(
+                        document.getElementById("stepSize").value
+                    );
+
+                    // Generate string
+                    let current = axiom;
+                    for (let i = 0; i < iterations; i++) {
+                        let next = "";
+                        for (const char of current) {
+                            next += char === "F" ? ruleF : char;
+                        }
+                        current = next;
+                    }
+
+                    // Turtle interpretation
+                    let x = WIDTH / 2;
+                    let y = HEIGHT;
+                    let angleDeg = -90;
+                    const stack = [];
+
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+
+                    for (const char of current) {
+                        if (char === "F") {
+                            const rad = (angleDeg * Math.PI) / 180;
+                            const newX = x + Math.cos(rad) * step;
+                            const newY = y + Math.sin(rad) * step;
+                            ctx.lineTo(newX, newY);
+                            x = newX;
+                            y = newY;
+                        } else if (char === "+") {
+                            angleDeg += angle;
+                        } else if (char === "-") {
+                            angleDeg -= angle;
+                        } else if (char === "[") {
+                            stack.push({ x, y, angleDeg });
+                        } else if (char === "]") {
+                            const state = stack.pop();
+                            if (state) {
+                                x = state.x;
+                                y = state.y;
+                                angleDeg = state.angleDeg;
+                                ctx.moveTo(x, y);
+                            }
+                        }
+                    }
+
+                    ctx.stroke();
                 }
             };
 
