@@ -1,257 +1,566 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pattern Generator</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #111827;
-      color: #e5e7eb;
-      margin: 0;
-      padding: 16px;
-    }
-    .section {
-      margin-bottom: 24px;
-      background: #1f2937;
-      padding: 16px;
-      border-radius: 8px;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-    input, select {
-      width: 100%;
-      padding: 6px;
-      margin-top: 4px;
-      border-radius: 6px;
-      border: 1px solid #374151;
-      background: #111827;
-      color: #f3f4f6;
-    }
-    button {
-      width: 100%;
-      margin-top: 16px;
-      padding: 10px;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    canvas {
-      display: block;
-      margin: 16px auto 0;
-      background: #374151;
-      border-radius: 8px;
-    }
-  </style>
-</head>
-<body>
-  <!-- 🔉 Noise Generator -->
-  <div class="section">
-    <h2>Noise Generator</h2>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Pattern Generator</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            :root {
+                --bg: #111827;
+                --panel: #1f2937;
+                --border: #374151;
+                --text: #e5e7eb;
+                --accent: #3b82f6;
+            }
+            body {
+                font-family: sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                margin: 0;
+                padding: 16px;
+            }
+            .section {
+                background: var(--panel);
+                border-radius: 8px;
+                padding: 16px;
+                margin-bottom: 20px;
+            }
+            h2 {
+                margin: 0 0 8px;
+                font-size: 16px;
+            }
+            label {
+                font-size: 13px;
+                margin-top: 12px;
+                display: block;
+            }
+            input,
+            select {
+                width: 100%;
+                padding: 6px;
+                border: 1px solid var(--border);
+                background: var(--bg);
+                color: var(--text);
+                border-radius: 6px;
+                margin-top: 4px;
+            }
+            canvas {
+                display: block;
+                margin: 16px auto;
+                background: #374151;
+                border-radius: 6px;
+            }
+            button,
+            .tab-button {
+                padding: 10px;
+                font-weight: bold;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                background: var(--accent);
+                color: white;
+                margin-top: 12px;
+                width: 100%;
+            }
+            .tab-bar {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 12px;
+            }
+            .tab-button {
+                flex: 1;
+                margin-right: 4px;
+                background: #1e40af;
+            }
+            .tab-button.active {
+                background: var(--accent);
+            }
+            .hidden {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Tabs -->
+        <div class="section">
+            <h2>Pattern Type</h2>
+            <div class="tab-bar">
+                <button class="tab-button active" data-tab="noise">
+                    Noise
+                </button>
+                <button class="tab-button" data-tab="grid">Grid</button>
+                <button class="tab-button" data-tab="organic">Organic</button>
+                <button class="tab-button" data-tab="halftone">Halftone</button>
+            </div>
+        </div>
 
-    <label for="noiseType">Noise Type</label>
-    <select id="noiseType">
-      <option value="white">White Noise</option>
-      <option value="perlin">Perlin Noise</option>
-      <option value="simplex">Simplex Noise</option>
-      <option value="worley">Worley Noise</option>
-    </select>
+        <!-- Grid Controls -->
+        <div id="grid" class="section">
+            <h2>Grid Settings</h2>
 
-    <label for="noiseScale">Scale</label>
-    <input type="range" id="noiseScale" min="10" max="200" value="80" />
+            <label for="shapeType">Shape</label>
+            <select id="shapeType">
+                <option value="square">Square</option>
+                <option value="hex">Hex</option>
+                <option value="triangle">Triangle</option>
+            </select>
 
-    <label for="noiseColor1">Color 1</label>
-    <input type="color" id="noiseColor1" value="#000000" />
+            <label for="cellSize">Cell Size</label>
+            <input type="number" id="cellSize" value="20" />
 
-    <label for="noiseColor2">Color 2</label>
-    <input type="color" id="noiseColor2" value="#ffffff" />
+            <label for="lineThickness">Line Thickness</label>
+            <input type="number" id="lineThickness" value="1" />
 
-    <button id="generateNoise">Generate Noise</button>
-  </div>
+            <label for="lineColor">Stroke Color</label>
+            <input type="color" id="lineColor" value="#60a5fa" />
 
-  <!-- 🔷 Geometric Generator -->
-  <div class="section">
-    <h2>Geometric Pattern</h2>
+            <label for="fillColor">Fill Color</label>
+            <input type="color" id="fillColor" value="#1f2937" />
 
-    <label for="shapeType">Shape</label>
-    <select id="shapeType">
-      <option value="square">Square Grid</option>
-      <option value="hex">Hexagon Grid</option>
-      <option value="triangle">Triangle Grid</option>
-    </select>
+            <label>
+                <input type="checkbox" id="randomVariation" />
+                Enable Random Variation
+            </label>
 
-    <label for="cellSize">Cell Size</label>
-    <input type="number" id="cellSize" min="5" max="100" value="20" />
+            <button id="generateGrid">Generate</button>
+        </div>
 
-    <label for="lineThickness">Line Thickness</label>
-    <input type="number" id="lineThickness" min="0.5" max="5" step="0.1" value="1" />
+        <!-- Placeholder tabs -->
+        <div id="noise" class="section">
+            <h2>Noise Settings</h2>
 
-    <label for="lineColor">Line Color</label>
-    <input type="color" id="lineColor" value="#60a5fa" />
+            <label for="noiseType">Noise Type</label>
+            <select id="noiseType">
+                <option value="white">White</option>
+                <option value="perlin">Perlin</option>
+                <option value="simplex">Simplex</option>
+                <option value="worley">Worley</option>
+            </select>
 
-    <label for="fillColor">Fill Color</label>
-    <input type="color" id="fillColor" value="#1f2937" />
+            <label for="noiseScale">Scale</label>
+            <input type="range" id="noiseScale" min="10" max="200" value="80" />
 
-    <button id="generateShape">Generate Grid</button>
-  </div>
+            <label for="noiseColor1">Color 1</label>
+            <input type="color" id="noiseColor1" value="#000000" />
 
-  <!-- 🖼 Preview + Apply -->
-  <div class="section">
-    <h2>Preview</h2>
-    <canvas id="previewCanvas" width="200" height="200"></canvas>
-    <button id="applyPattern">Apply to Selection</button>
-  </div>
+            <label for="noiseColor2">Color 2</label>
+            <input type="color" id="noiseColor2" value="#ffffff" />
 
-  <script>
-    const canvas = document.getElementById("previewCanvas");
-    const ctx = canvas.getContext("2d");
+            <button id="generateNoise">Generate</button>
+        </div>
+        <div id="organic" class="section hidden">
+            <h2>Coming soon: Voronoi, Delaunay, L-System</h2>
+        </div>
+        <div id="halftone" class="section hidden">
+            <h2>Coming soon: Halftone</h2>
+        </div>
 
-    // Controls
-    const noiseType = document.getElementById("noiseType");
-    const noiseScale = document.getElementById("noiseScale");
-    const noiseColor1 = document.getElementById("noiseColor1");
-    const noiseColor2 = document.getElementById("noiseColor2");
+        <!-- Preview -->
+        <div class="section">
+            <h2>Preview</h2>
+            <canvas id="previewCanvas" width="200" height="200"></canvas>
+            <button id="applyPattern">Apply to Selection</button>
+        </div>
 
-    const shapeType = document.getElementById("shapeType");
-    const cellSize = document.getElementById("cellSize");
-    const lineThickness = document.getElementById("lineThickness");
-    const lineColor = document.getElementById("lineColor");
-    const fillColor = document.getElementById("fillColor");
+        <script>
+            const canvas = document.getElementById("previewCanvas");
+            const ctx = canvas.getContext("2d");
+            const WIDTH = canvas.width;
+            const HEIGHT = canvas.height;
 
-    const WIDTH = canvas.width;
-    const HEIGHT = canvas.height;
-    const randomPoints = Array.from({ length: 40 }, () => ({ x: Math.random(), y: Math.random() }));
+            document.querySelectorAll(".tab-button").forEach(btn => {
+                btn.onclick = () => {
+                    document
+                        .querySelectorAll(".tab-button")
+                        .forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    ["grid", "noise", "organic", "halftone"].forEach(id => {
+                        document
+                            .getElementById(id)
+                            .classList.toggle("hidden", id !== btn.dataset.tab);
+                    });
+                };
+            });
 
-    // 🎨 Color helper
-    function hexToRgb(hex) {
-      const num = parseInt(hex.slice(1), 16);
-      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-    }
+            function hexToHSL(hex) {
+                const r = parseInt(hex.slice(1, 3), 16) / 255;
+                const g = parseInt(hex.slice(3, 5), 16) / 255;
+                const b = parseInt(hex.slice(5, 7), 16) / 255;
+                const max = Math.max(r, g, b),
+                    min = Math.min(r, g, b);
+                let h,
+                    s,
+                    l = (max + min) / 2;
 
-    // 🧪 Noise Generators (same as before)
-    // ... [Insert perlin2, simplex2, worley2, grad, fade, etc. from previous message here] ...
+                if (max === min) {
+                    h = s = 0;
+                } else {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r:
+                            h = (g - b) / d + (g < b ? 6 : 0);
+                            break;
+                        case g:
+                            h = (b - r) / d + 2;
+                            break;
+                        case b:
+                            h = (r - g) / d + 4;
+                            break;
+                    }
+                    h *= 60;
+                }
+                return { h, s: s * 100, l: l * 100 };
+            }
 
-    // 🔉 Generate Noise
-    document.getElementById("generateNoise").onclick = () => {
-      const scale = parseInt(noiseScale.value);
-      const color1 = hexToRgb(noiseColor1.value);
-      const color2 = hexToRgb(noiseColor2.value);
-      const type = noiseType.value;
-      const imageData = ctx.createImageData(WIDTH, HEIGHT);
+            function hslToString(h, s, l) {
+                return `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(
+                    l
+                )}%)`;
+            }
 
-      for (let y = 0; y < HEIGHT; y++) {
-        for (let x = 0; x < WIDTH; x++) {
-          const i = (y * WIDTH + x) * 4;
-          const nx = x / scale;
-          const ny = y / scale;
-          let t = 0;
+            function drawHex(x, y, size) {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i;
+                    const px = x + size * Math.cos(angle);
+                    const py = y + size * Math.sin(angle);
+                    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
 
-          if (type === "white") t = Math.random();
-          else if (type === "perlin") t = perlin2(nx, ny) * 0.5 + 0.5;
-          else if (type === "simplex") t = simplex2(nx, ny) * 0.5 + 0.5;
-          else if (type === "worley") t = worley2(nx, ny);
+            function drawTriangle(x, y, size, up = true) {
+                const h = (size * Math.sqrt(3)) / 2;
+                ctx.beginPath();
+                if (up) {
+                    ctx.moveTo(x, y + h);
+                    ctx.lineTo(x + size / 2, y);
+                    ctx.lineTo(x + size, y + h);
+                } else {
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + size / 2, y + h);
+                    ctx.lineTo(x + size, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
 
-          imageData.data[i]     = color1.r + t * (color2.r - color1.r);
-          imageData.data[i + 1] = color1.g + t * (color2.g - color1.g);
-          imageData.data[i + 2] = color1.b + t * (color2.b - color1.b);
-          imageData.data[i + 3] = 255;
-        }
-      }
+            // === Noise Functions ===
+            const perm = new Uint8Array(512);
+            const grad2 = [
+                [1, 1],
+                [-1, 1],
+                [1, -1],
+                [-1, -1],
+                [1, 0],
+                [-1, 0],
+                [0, 1],
+                [0, -1],
+            ];
+            for (let i = 0; i < 256; i++) perm[i] = i;
+            for (let i = 0; i < 256; i++) {
+                const j = Math.floor(Math.random() * 256);
+                [perm[i], perm[j]] = [perm[j], perm[i]];
+            }
+            for (let i = 0; i < 256; i++) perm[i + 256] = perm[i];
 
-      ctx.putImageData(imageData, 0, 0);
-    };
+            function fade(t) {
+                return t * t * t * (t * (t * 6 - 15) + 10);
+            }
+            function lerp(a, b, t) {
+                return a + t * (b - a);
+            }
+            function grad(hash, x, y) {
+                const g = grad2[hash & 7];
+                return g[0] * x + g[1] * y;
+            }
 
-    // 🧱 Generate Shape Pattern
-    document.getElementById("generateShape").onclick = () => {
-      const shape = shapeType.value;
-      const size = parseInt(cellSize.value);
-      const stroke = lineColor.value;
-      const fill = fillColor.value;
-      const thick = parseFloat(lineThickness.value);
+            function perlin2(x, y) {
+                const X = Math.floor(x) & 255;
+                const Y = Math.floor(y) & 255;
 
-      ctx.clearRect(0, 0, WIDTH, HEIGHT);
-      ctx.lineWidth = thick;
-      ctx.strokeStyle = stroke;
-      ctx.fillStyle = fill;
+                x -= Math.floor(x);
+                y -= Math.floor(y);
 
-      if (shape === "square") {
-        for (let y = 0; y < HEIGHT; y += size) {
-          for (let x = 0; x < WIDTH; x += size) {
-            ctx.beginPath();
-            ctx.rect(x, y, size, size);
-            ctx.fill();
-            ctx.stroke();
-          }
-        }
-      }
+                const u = fade(x);
+                const v = fade(y);
 
-      if (shape === "hex") {
-        const h = size * Math.sqrt(3) / 2;
-        for (let y = 0; y < HEIGHT + size; y += h) {
-          for (let x = 0; x < WIDTH + size; x += size * 1.5) {
-            drawHexagon(x, y + (x / size % 2 === 0 ? 0 : h / 2), size);
-          }
-        }
-      }
+                const aa = perm[X + perm[Y]];
+                const ab = perm[X + perm[Y + 1]];
+                const ba = perm[X + 1 + perm[Y]];
+                const bb = perm[X + 1 + perm[Y + 1]];
 
-      if (shape === "triangle") {
-        const h = size * Math.sqrt(3) / 2;
-        for (let y = 0; y < HEIGHT + size; y += h) {
-          for (let x = 0; x < WIDTH + size; x += size) {
-            const up = (x / size + y / h) % 2 === 0;
-            drawTriangle(x, y, size, up);
-          }
-        }
-      }
-    };
+                return lerp(
+                    lerp(grad(aa, x, y), grad(ba, x - 1, y), u),
+                    lerp(grad(ab, x, y - 1), grad(bb, x - 1, y - 1), u),
+                    v
+                );
+            }
 
-    function drawHexagon(cx, cy, r) {
-      ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const angle = Math.PI / 3 * i;
-        const x = cx + r * Math.cos(angle);
-        const y = cy + r * Math.sin(angle);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
+            function simplex2(x, y) {
+                const F2 = 0.5 * (Math.sqrt(3) - 1);
+                const G2 = (3 - Math.sqrt(3)) / 6;
 
-    function drawTriangle(x, y, size, up = true) {
-      const h = size * Math.sqrt(3) / 2;
-      ctx.beginPath();
-      if (up) {
-        ctx.moveTo(x, y + h);
-        ctx.lineTo(x + size / 2, y);
-        ctx.lineTo(x + size, y + h);
-      } else {
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + size / 2, y + h);
-        ctx.lineTo(x + size, y);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
+                const s = (x + y) * F2;
+                const i = Math.floor(x + s);
+                const j = Math.floor(y + s);
+                const t = (i + j) * G2;
+                const X0 = i - t;
+                const Y0 = j - t;
+                const x0 = x - X0;
+                const y0 = y - Y0;
 
-    // 🖼 Apply to Selection
-    document.getElementById("applyPattern").onclick = () => {
-      const dataURL = canvas.toDataURL("image/png");
-      parent.postMessage({
-        pluginMessage: {
-          type: "apply-pattern",
-          base64: dataURL.split(",")[1]
-        }
-      }, "*");
-    };
-  </script>
-</body>
+                let i1 = 0,
+                    j1 = 0;
+                if (x0 > y0) {
+                    i1 = 1;
+                    j1 = 0;
+                } else {
+                    i1 = 0;
+                    j1 = 1;
+                }
+
+                const x1 = x0 - i1 + G2;
+                const y1 = y0 - j1 + G2;
+                const x2 = x0 - 1 + 2 * G2;
+                const y2 = y0 - 1 + 2 * G2;
+
+                const ii = i & 255;
+                const jj = j & 255;
+                const gi0 = perm[ii + perm[jj]] % 8;
+                const gi1 = perm[ii + i1 + perm[jj + j1]] % 8;
+                const gi2 = perm[ii + 1 + perm[jj + 1]] % 8;
+
+                const t0 = 0.5 - x0 * x0 - y0 * y0;
+                const t1 = 0.5 - x1 * x1 - y1 * y1;
+                const t2 = 0.5 - x2 * x2 - y2 * y2;
+
+                let n0 = 0,
+                    n1 = 0,
+                    n2 = 0;
+                if (t0 > 0) {
+                    const t0s = t0 * t0;
+                    n0 = t0s * t0s * grad(gi0, x0, y0);
+                }
+                if (t1 > 0) {
+                    const t1s = t1 * t1;
+                    n1 = t1s * t1s * grad(gi1, x1, y1);
+                }
+                if (t2 > 0) {
+                    const t2s = t2 * t2;
+                    n2 = t2s * t2s * grad(gi2, x2, y2);
+                }
+
+                return 70 * (n0 + n1 + n2);
+            }
+
+            function worley2(x, y) {
+                const points = Array.from({ length: 40 }, () => ({
+                    x: Math.random() * 10,
+                    y: Math.random() * 10,
+                }));
+
+                let minDist = Infinity;
+                for (const p of points) {
+                    const dx = x - p.x;
+                    const dy = y - p.y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < minDist) minDist = d;
+                }
+                return Math.min(minDist / 2, 1);
+            }
+
+            document.getElementById("generateGrid").onclick = () => {
+                const shape = document.getElementById("shapeType").value;
+                const size = parseFloat(
+                    document.getElementById("cellSize").value
+                );
+                const lineColor = document.getElementById("lineColor").value;
+                const fillColor = document.getElementById("fillColor").value;
+                const thick = parseFloat(
+                    document.getElementById("lineThickness").value
+                );
+                const randomize =
+                    document.getElementById("randomVariation").checked;
+
+                ctx.clearRect(0, 0, WIDTH, HEIGHT);
+                ctx.lineWidth = thick;
+                ctx.strokeStyle = lineColor;
+
+                const baseHSL = hexToHSL(fillColor);
+
+                if (shape === "square") {
+                    for (let y = 0; y < HEIGHT; y += size) {
+                        for (let x = 0; x < WIDTH; x += size) {
+                            ctx.save();
+                            const cx = x + size / 2;
+                            const cy = y + size / 2;
+                            ctx.translate(cx, cy);
+
+                            const scale = randomize
+                                ? 0.8 + Math.random() * 0.4
+                                : 1;
+                            const rotate = randomize
+                                ? Math.random() * Math.PI * 2
+                                : 0;
+                            const alpha = randomize
+                                ? 0.6 + Math.random() * 0.4
+                                : 1;
+                            const tint = randomize
+                                ? hslToString(
+                                      baseHSL.h + Math.random() * 20 - 10,
+                                      baseHSL.s,
+                                      baseHSL.l + Math.random() * 10 - 5
+                                  )
+                                : fillColor;
+
+                            ctx.rotate(rotate);
+                            ctx.globalAlpha = alpha;
+                            ctx.fillStyle = tint;
+                            ctx.beginPath();
+                            ctx.rect(
+                                (-size * scale) / 2,
+                                (-size * scale) / 2,
+                                size * scale,
+                                size * scale
+                            );
+                            ctx.fill();
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                }
+
+                if (shape === "hex") {
+                    const h = (size * Math.sqrt(3)) / 2;
+                    for (let y = 0; y < HEIGHT + size; y += h) {
+                        for (let x = 0; x < WIDTH + size; x += size * 1.5) {
+                            ctx.save();
+                            const offsetY = (x / size) % 2 === 0 ? 0 : h / 2;
+                            const cx = x,
+                                cy = y + offsetY;
+                            ctx.translate(cx, cy);
+
+                            const scale = randomize
+                                ? 0.8 + Math.random() * 0.4
+                                : 1;
+                            const rotate = randomize
+                                ? Math.random() * Math.PI * 2
+                                : 0;
+                            const alpha = randomize
+                                ? 0.6 + Math.random() * 0.4
+                                : 1;
+                            const tint = randomize
+                                ? hslToString(
+                                      baseHSL.h + Math.random() * 20 - 10,
+                                      baseHSL.s,
+                                      baseHSL.l + Math.random() * 10 - 5
+                                  )
+                                : fillColor;
+
+                            ctx.rotate(rotate);
+                            ctx.globalAlpha = alpha;
+                            ctx.fillStyle = tint;
+                            drawHex(0, 0, size * scale);
+                            ctx.restore();
+                        }
+                    }
+                }
+
+                if (shape === "triangle") {
+                    const h = (size * Math.sqrt(3)) / 2;
+                    for (let y = 0; y < HEIGHT + size; y += h) {
+                        for (let x = 0; x < WIDTH + size; x += size) {
+                            ctx.save();
+                            const up = (x / size + y / h) % 2 === 0;
+                            const cx = x,
+                                cy = y;
+
+                            ctx.translate(cx, cy);
+
+                            const scale = randomize
+                                ? 0.8 + Math.random() * 0.4
+                                : 1;
+                            const rotate = randomize
+                                ? Math.random() * Math.PI * 2
+                                : 0;
+                            const alpha = randomize
+                                ? 0.6 + Math.random() * 0.4
+                                : 1;
+                            const tint = randomize
+                                ? hslToString(
+                                      baseHSL.h + Math.random() * 20 - 10,
+                                      baseHSL.s,
+                                      baseHSL.l + Math.random() * 10 - 5
+                                  )
+                                : fillColor;
+
+                            ctx.rotate(rotate);
+                            ctx.globalAlpha = alpha;
+                            ctx.fillStyle = tint;
+                            drawTriangle(0, 0, size * scale, up);
+                            ctx.restore();
+                        }
+                    }
+                }
+
+                ctx.globalAlpha = 1; // Reset alpha
+            };
+
+            document.getElementById("generateNoise").onclick = () => {
+                const type = document.getElementById("noiseType").value;
+                const scale = parseFloat(
+                    document.getElementById("noiseScale").value
+                );
+                const color1 = hexToHSL(
+                    document.getElementById("noiseColor1").value
+                );
+                const color2 = hexToHSL(
+                    document.getElementById("noiseColor2").value
+                );
+
+                const imageData = ctx.createImageData(WIDTH, HEIGHT);
+
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        const i = (y * WIDTH + x) * 4;
+                        const nx = x / scale;
+                        const ny = y / scale;
+                        let t = 0;
+
+                        if (type === "white") t = Math.random();
+                        else if (type === "perlin")
+                            t = perlin2(nx, ny) * 0.5 + 0.5;
+                        else if (type === "simplex")
+                            t = simplex2(nx, ny) * 0.5 + 0.5;
+                        else if (type === "worley") t = worley2(nx, ny);
+
+                        const h = color1.h + t * (color2.h - color1.h);
+                        const s = color1.s + t * (color2.s - color1.s);
+                        const l = color1.l + t * (color2.l - color1.l);
+
+                        ctx.fillStyle = `hsl(${h}, ${s}%, ${l}%)`;
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+            };
+
+            document.getElementById("applyPattern").onclick = () => {
+                const dataURL = canvas.toDataURL("image/png");
+                parent.postMessage(
+                    {
+                        pluginMessage: {
+                            type: "apply-pattern",
+                            base64: dataURL.split(",")[1],
+                        },
+                    },
+                    "*"
+                );
+            };
+        </script>
+    </body>
 </html>
