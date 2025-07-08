@@ -7,5 +7,8 @@
   "devDependencies": {
     "@figma/plugin-typings": "^1.60.0",
     "esbuild": "^0.21.0"
+  },
+  "dependencies": {
+    "d3-delaunay": "^6.0.4"
   }
 }

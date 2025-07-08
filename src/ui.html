@@ -125,7 +125,7 @@
             <button id="generateGrid">Generate</button>
         </div>
 
-        <!-- Placeholder tabs -->
+        <!-- Noise Controls -->
         <div id="noise" class="section">
             <h2>Noise Settings</h2>
 
@@ -148,8 +148,24 @@
 
             <button id="generateNoise">Generate</button>
         </div>
+
+        <!-- Organic Controls -->
         <div id="organic" class="section hidden">
-            <h2>Coming soon: Voronoi, Delaunay, L-System</h2>
+            <h2>Organic Patterns</h2>
+
+            <label for="organicType">Type</label>
+            <select id="organicType">
+                <option value="voronoi">Voronoi</option>
+                <option value="delaunay">Delaunay</option>
+            </select>
+
+            <label for="pointCount">Number of Points</label>
+            <input type="number" id="pointCount" value="30" />
+
+            <label for="organicColor">Stroke Color</label>
+            <input type="color" id="organicColor" value="#10b981" />
+
+            <button id="generateOrganic">Generate</button>
         </div>
         <div id="halftone" class="section hidden">
             <h2>Coming soon: Halftone</h2>
@@ -162,6 +178,7 @@
             <button id="applyPattern">Apply to Selection</button>
         </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/d3-delaunay@6"></script>
         <script>
             const canvas = document.getElementById("previewCanvas");
             const ctx = canvas.getContext("2d");
@@ -545,6 +562,52 @@
 
                         ctx.fillStyle = `hsl(${h}, ${s}%, ${l}%)`;
                         ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+            };
+
+            document.getElementById("generateOrganic").onclick = () => {
+                const type = document.getElementById("organicType").value;
+                const count = parseInt(
+                    document.getElementById("pointCount").value
+                );
+                const stroke = document.getElementById("organicColor").value;
+
+                ctx.clearRect(0, 0, WIDTH, HEIGHT);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = stroke;
+
+                // Generate random points
+                const points = Array.from({ length: count }, () => [
+                    Math.random() * WIDTH,
+                    Math.random() * HEIGHT,
+                ]);
+
+                const delaunay = d3.Delaunay.from(points);
+                const voronoi = delaunay.voronoi([0, 0, WIDTH, HEIGHT]);
+
+                if (type === "voronoi") {
+                    for (let i = 0; i < points.length; i++) {
+                        const cell = voronoi.cellPolygon(i);
+                        if (!cell) continue;
+                        ctx.beginPath();
+                        ctx.moveTo(cell[0][0], cell[0][1]);
+                        for (let j = 1; j < cell.length; j++) {
+                            ctx.lineTo(cell[j][0], cell[j][1]);
+                        }
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                }
+
+                if (type === "delaunay") {
+                    for (let triangle of delaunay.trianglePolygons()) {
+                        ctx.beginPath();
+                        ctx.moveTo(triangle[0][0], triangle[0][1]);
+                        ctx.lineTo(triangle[1][0], triangle[1][1]);
+                        ctx.lineTo(triangle[2][0], triangle[2][1]);
+                        ctx.closePath();
+                        ctx.stroke();
                     }
                 }
             };

@@ -8,6 +8,6 @@
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["none"]
+    "allowedDomains": ["https://cdn.jsdelivr.net"]
   }
 }

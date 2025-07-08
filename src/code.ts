@@ -1,4 +1,5 @@
 /// <reference types="@figma/plugin-typings" />
+// import { Delaunay } from "d3-delaunay";
 
 figma.showUI(__html__, { width: 360, height: 600 });
 
