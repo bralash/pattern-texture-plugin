@@ -1,0 +1,11 @@
+{
+  "name": "pattern-texture-plugin",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild src/code.ts --bundle --outfile=dist/code.js --format=iife && cp src/ui.html dist/ui.html"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.60.0",
+    "esbuild": "^0.21.0"
+  }
+}

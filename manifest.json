@@ -1,0 +1,13 @@
+{
+  "name": "Pattern Texture Creator",
+  "id": "1524069206655542022",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma"],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  }
+}
