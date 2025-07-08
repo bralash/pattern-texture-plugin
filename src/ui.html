@@ -50,8 +50,7 @@
                 background: #374151;
                 border-radius: 6px;
             }
-            button,
-            .tab-button {
+            button {
                 padding: 10px;
                 font-weight: bold;
                 border: none;
@@ -65,18 +64,95 @@
             .tab-bar {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 12px;
+                gap: 8px;
             }
             .tab-button {
                 flex: 1;
-                margin-right: 4px;
-                background: #1e40af;
+                padding: 8px 12px;
+                border-radius: 9999px;
+                border: 1px solid #fff;
+                background: transparent;
+                color: #fff;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
             }
             .tab-button.active {
                 background: var(--accent);
+                color: #fff;
+                border-color: transparent;
             }
             .hidden {
                 display: none;
+            }
+            .color-row {
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+                margin-top: 12px;
+            }
+
+            .color-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 80px;
+            }
+
+            .color-item label {
+                font-size: 12px;
+                text-align: center;
+                margin-bottom: 4px;
+            }
+
+            .color-item input[type="color"] {
+                width: 36px;
+                height: 36px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+            }
+
+            .checkbox-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 12px;
+                cursor: pointer;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            .checkbox-row input[type="checkbox"] {
+                appearance: none;
+                width: 16px;
+                height: 16px;
+                border: 2px solid #3a3546;
+                border-radius: 4px;
+                background: transparent;
+                position: relative;
+                cursor: pointer;
+            }
+
+            .checkbox-row input[type="checkbox"]:checked {
+                background-color: #3a3546;
+            }
+
+            .checkbox-row input[type="checkbox"]::after {
+                content: "";
+                position: absolute;
+                top: 2px;
+                left: 5px;
+                width: 3px;
+                height: 7px;
+                border: solid #fff;
+                border-width: 0 2px 2px 0;
+                opacity: 0;
+                transform: rotate(45deg);
+            }
+
+            .checkbox-row input[type="checkbox"]:checked::after {
+                opacity: 1;
             }
         </style>
     </head>
@@ -92,6 +168,35 @@
                 <button class="tab-button" data-tab="organic">Organic</button>
                 <button class="tab-button" data-tab="halftone">Halftone</button>
             </div>
+        </div>
+
+        <!-- Noise Controls -->
+        <div id="noise" class="section">
+            <h2>Noise Settings</h2>
+
+            <label for="noiseType">Noise Type</label>
+            <select id="noiseType">
+                <option value="white">White</option>
+                <option value="perlin">Perlin</option>
+                <option value="simplex">Simplex</option>
+                <option value="worley">Worley</option>
+            </select>
+
+            <label for="noiseScale">Scale</label>
+            <input type="range" id="noiseScale" min="10" max="200" value="80" />
+
+            <div class="color-row">
+                <div class="color-item">
+                    <label for="noiseColor1">Color 1</label>
+                    <input type="color" id="noiseColor1" value="#000000" />
+                </div>
+                <div class="color-item">
+                    <label for="noiseColor2">Color 2</label>
+                    <input type="color" id="noiseColor2" value="#ffffff" />
+                </div>
+            </div>
+
+            <button id="generateNoise">Generate</button>
         </div>
 
         <!-- Grid Controls -->
@@ -111,42 +216,23 @@
             <label for="lineThickness">Line Thickness</label>
             <input type="number" id="lineThickness" value="1" />
 
-            <label for="lineColor">Stroke Color</label>
-            <input type="color" id="lineColor" value="#60a5fa" />
+            <div class="color-row">
+                <div class="color-item">
+                    <label for="lineColor">Stroke Color</label>
+                    <input type="color" id="lineColor" value="#000000" />
+                </div>
+                <div class="color-item">
+                    <label for="fillColor">Fill Color</label>
+                    <input type="color" id="fillColor" value="#ffffff" />
+                </div>
+            </div>
 
-            <label for="fillColor">Fill Color</label>
-            <input type="color" id="fillColor" value="#1f2937" />
-
-            <label>
+            <label class="checkbox-row">
                 <input type="checkbox" id="randomVariation" />
                 Enable Random Variation
             </label>
 
             <button id="generateGrid">Generate</button>
-        </div>
-
-        <!-- Noise Controls -->
-        <div id="noise" class="section">
-            <h2>Noise Settings</h2>
-
-            <label for="noiseType">Noise Type</label>
-            <select id="noiseType">
-                <option value="white">White</option>
-                <option value="perlin">Perlin</option>
-                <option value="simplex">Simplex</option>
-                <option value="worley">Worley</option>
-            </select>
-
-            <label for="noiseScale">Scale</label>
-            <input type="range" id="noiseScale" min="10" max="200" value="80" />
-
-            <label for="noiseColor1">Color 1</label>
-            <input type="color" id="noiseColor1" value="#000000" />
-
-            <label for="noiseColor2">Color 2</label>
-            <input type="color" id="noiseColor2" value="#ffffff" />
-
-            <button id="generateNoise">Generate</button>
         </div>
 
         <!-- Organic Controls -->
@@ -189,7 +275,32 @@
         </div>
 
         <div id="halftone" class="section hidden">
-            <h2>Coming soon: Halftone</h2>
+            <h2>Halftone Settings</h2>
+
+            <label for="dotShape">Dot Shape</label>
+            <select id="dotShape">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+            </select>
+
+            <label for="dotSizeMin">Min Dot Size</label>
+            <input type="number" id="dotSizeMin" value="2" />
+
+            <label for="dotSizeMax">Max Dot Size</label>
+            <input type="number" id="dotSizeMax" value="10" />
+
+            <label for="dotDensity">Density</label>
+            <input type="range" id="dotDensity" min="5" max="80" value="30" />
+
+            <label for="halftoneAngle">Screen Angle</label>
+            <input type="number" id="halftoneAngle" value="0" />
+
+            <label class="checkbox-row">
+                <input type="checkbox" id="greyscaleMode" />
+                Grayscale Conversion
+            </label>
+
+            <button id="generateHalftone">Generate</button>
         </div>
 
         <!-- Preview -->
@@ -206,18 +317,28 @@
             const WIDTH = canvas.width;
             const HEIGHT = canvas.height;
 
-            document.querySelectorAll(".tab-button").forEach(btn => {
-                btn.onclick = () => {
+            const tabs = document.querySelectorAll(".tab-button");
+            const tabSections = ["noise", "grid", "organic", "halftone"];
+
+            function activateTab(tabId) {
+                tabs.forEach(btn => {
+                    btn.classList.toggle("active", btn.dataset.tab === tabId);
+                });
+                tabSections.forEach(id => {
                     document
-                        .querySelectorAll(".tab-button")
-                        .forEach(b => b.classList.remove("active"));
-                    btn.classList.add("active");
-                    ["grid", "noise", "organic", "halftone"].forEach(id => {
-                        document
-                            .getElementById(id)
-                            .classList.toggle("hidden", id !== btn.dataset.tab);
-                    });
-                };
+                        .getElementById(id)
+                        .classList.toggle("hidden", id !== tabId);
+                });
+            }
+
+            // Init default tab on load
+            activateTab("noise");
+
+            // Handle clicks
+            tabs.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    activateTab(btn.dataset.tab);
+                });
             });
 
             function hexToHSL(hex) {
@@ -702,6 +823,77 @@
 
                     ctx.stroke();
                 }
+            };
+
+            document.getElementById("generateHalftone").onclick = () => {
+                const shape = document.getElementById("dotShape").value;
+                const minSize = parseFloat(
+                    document.getElementById("dotSizeMin").value
+                );
+                const maxSize = parseFloat(
+                    document.getElementById("dotSizeMax").value
+                );
+                const density = parseInt(
+                    document.getElementById("dotDensity").value
+                );
+                const angle =
+                    parseFloat(document.getElementById("halftoneAngle").value) *
+                    (Math.PI / 180);
+                const useGreyscale =
+                    document.getElementById("greyscaleMode").checked;
+
+                ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+                const cols = density;
+                const rows = density;
+                const cellW = WIDTH / cols;
+                const cellH = HEIGHT / rows;
+
+                // rotate the canvas around center
+                ctx.save();
+                ctx.translate(WIDTH / 2, HEIGHT / 2);
+                ctx.rotate(angle);
+                ctx.translate(-WIDTH / 2, -HEIGHT / 2);
+
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cx = col * cellW + cellW / 2;
+                        const cy = row * cellH + cellH / 2;
+
+                        // simulate brightness using distance from center (or use perlin2 if desired)
+                        const dx = cx - WIDTH / 2;
+                        const dy = cy - HEIGHT / 2;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const maxDist = Math.sqrt(
+                            (WIDTH / 2) ** 2 + (HEIGHT / 2) ** 2
+                        );
+                        const brightness = 1 - dist / maxDist; // radial gradient (bright center)
+
+                        const dotSize =
+                            minSize + brightness * (maxSize - minSize);
+                        const fill = useGreyscale
+                            ? `hsl(0, 0%, ${brightness * 100}%)`
+                            : `hsl(${brightness * 360}, 100%, 50%)`;
+
+                        ctx.beginPath();
+                        ctx.fillStyle = fill;
+
+                        if (shape === "circle") {
+                            ctx.arc(cx, cy, dotSize / 2, 0, Math.PI * 2);
+                        } else {
+                            ctx.rect(
+                                cx - dotSize / 2,
+                                cy - dotSize / 2,
+                                dotSize,
+                                dotSize
+                            );
+                        }
+
+                        ctx.fill();
+                    }
+                }
+
+                ctx.restore(); // reset rotation
             };
 
             document.getElementById("applyPattern").onclick = () => {
